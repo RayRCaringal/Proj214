@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "mymalloc.h"
 
 typedef int bool;
 #define true 1
 #define false 0
+
+#define debug = 0
 
 
 //First-Fit Algorithim
@@ -21,14 +24,6 @@ Implementation:
 //Create Process and Block Size
 
 //Metadata block
-typedef struct block Block;
-  struct block{
-  int size;
-  bool free;
-  Block * next;  
-};
-
-const char memory[4096];
 
 
 void intialize(Block *metadata){
@@ -74,7 +69,7 @@ void split(Block *metadata, size_t size){
     intialize(metadata);
   }
     
-  if(metadata->size <= 0){
+  if(size <= 0){
     printf("Error \n");
     return;
   } 
@@ -85,14 +80,15 @@ void split(Block *metadata, size_t size){
      curr = curr->next;
    }
   //Now on an avalible block 
-    if(curr->size == size){ //If block size is exactly requested size then there is no more room for extra blocks
+    if(curr->size == size && curr->free == true){ //If block size is exactly requested size then there is no more room for extra blocks
       curr->free = false;
       result = curr+1;
-    }else if(curr->size > size +sizeof(Block)){ //We dont need to account for == size+blocksize since there's no more room anyways
+    }else if(curr->size > size +sizeof(Block) && curr->free == true ){ //We dont need to account for == size+blocksize since there's no more room anyways
       split(curr, size);
       result = curr+1;
-    }else{
+    }else{ // If size requested is less than size 
       result=NULL;
+      printf("Error, not enough memory");
   }
     return result;
 }
