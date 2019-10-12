@@ -1,13 +1,6 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "mymalloc.h"
-
-typedef int bool;
-#define true 1
-#define false 0
-
-#define debug = 0
 
 
 //First-Fit Algorithim
@@ -27,13 +20,13 @@ Implementation:
 //Metadata block
 
 
-void intialize(Block *metadata){
+void intialize(){
      metadata->size = 4096-sizeof(Block);
      metadata->free = true; //True is free, false is not 
      metadata->next = NULL;
 }
   
-void split(Block *metadata, size_t size){
+void split(int size){
   if(metadata->size < size){
     printf("Error not enoug memory");
     return;
@@ -47,7 +40,7 @@ void split(Block *metadata, size_t size){
  metadata->next=new;
 }
   
-  void merge(Block * metadata){
+  void merge(){
      if(metadata->next == NULL){
          metadata->free = true;
          return;
@@ -65,7 +58,7 @@ void split(Block *metadata, size_t size){
   }
   
   //Return pointer to memory address + 1 of metadata block
-  void* myMalloc(Block *metadata,size_t size){
+  void* myMalloc(int size){
   if(!(metadata->size)){
     intialize(metadata);
   }
@@ -85,7 +78,7 @@ void split(Block *metadata, size_t size){
       curr->free = false;
       result = curr+1;
     }else if(curr->size > size +sizeof(Block) && curr->free == true ){ //We dont need to account for == size+blocksize since there's no more room anyways
-      split(curr, size);
+      split(size);
       result = curr+1;
     }else{ // If size requested is less than size 
       result=NULL;
@@ -94,7 +87,7 @@ void split(Block *metadata, size_t size){
     return result;
 }
 
-void myFree(Block * metadata){
+void myFree(){
     if(metadata->next == NULL){
         metadata->free = true;
         return;
@@ -109,10 +102,9 @@ void myFree(Block * metadata){
   
 
 int main(int argc, char** argv) {
-  printf("This is the memory address %p\n",memory);
-  Block * ptr = (void*) memory; 
-  printf("This is the memory address of Block %p\n", ptr);
-  char * test = myMalloc(ptr, 50); 
+  printf("This is the memory address %p\n",memory); 
+  printf("This is the memory address of Block %p\n", metadata);
+  char * test = myMalloc(50); 
   test[0] = 'c';
   test[1] = 'b';
   test[2] = 'a';
@@ -129,5 +121,6 @@ int main(int argc, char** argv) {
   printf("Test[0] = %p\n", tester[0]);
   printf("Memory address of test = %p\n", tester);
   return;
+  
   
 }
