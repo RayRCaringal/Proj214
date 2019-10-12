@@ -1,14 +1,16 @@
 #ifndef MYMALLOC_H
 #define MYMALLOC_H
 
-static char memory[4096];
-
 typedef struct block Block;
   struct block{
   int size;
   bool free;
   Block * next;  
 };
+
+static char memory[4096];
+Block * metadata = (void*) memory;
+
 
 void intialize(Block *metadata);
 void split(Block *metadata, size_t size);
