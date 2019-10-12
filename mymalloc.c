@@ -52,10 +52,18 @@ void split(Block *metadata, size_t size){
 }
   
   void merge(Block * metadata){
+     if(metadata->next == NULL){
+         metadata->free = true;
+         return;
+     } 
     Block * curr = metadata, * prev; 
     while(curr ->next != NULL){
-      
-      
+        if(curr->free == false && curr->next->free == false){
+            curr->size = curr->size + curr->next->size + sizeof(Block); 
+            curr->next = curr->next->next;
+        }
+      prev = curr;
+      curr->next = curr->next->next;
     }
     
   }
