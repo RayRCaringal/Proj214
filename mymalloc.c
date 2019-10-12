@@ -70,6 +70,10 @@ void split(Block *metadata, size_t size){
   
   //Return pointer to memory address + 1 of metadata block
   void* myMalloc(Block *metadata,size_t size){
+  if(!(metadata->size)){
+    intialize(metadata);
+  }
+    
   if(metadata->size <= 0){
     printf("Error \n");
     return;
@@ -108,6 +112,25 @@ void myFree(Block * metadata){
   
 
 int main(int argc, char** argv) {
-  
+  printf("This is the memory address %p\n",memory);
+  Block * ptr = (void*) memory; 
+  printf("This is the memory address of Block %p\n", ptr);
+  char * test = myMalloc(ptr, 50); 
+  test[0] = 'c';
+  test[1] = 'b';
+  test[2] = 'a';
+  printf("Test[2] = %p\n", test[2]);
+  printf("Test[1] = %p\n", test[1]);
+  printf("Test[0] = %p\n", test[0]);
+  printf("Memory address of test = %p\n", test);
+  char * tester = malloc(sizeof(char) * 50);
+  tester[0] = 'f';
+  tester[1] = 'e';
+  tester[2] = 'd';
+  printf("Test[2] = %p\n", tester[2]);
+  printf("Test[1] = %p\n", tester[1]);
+  printf("Test[0] = %p\n", tester[0]);
+  printf("Memory address of test = %p\n", tester);
+  return;
   
 }
