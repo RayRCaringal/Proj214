@@ -26,18 +26,18 @@ void intialize(){
      metadata->next = NULL;
 }
   
-void split(int size){
-  if(metadata->size < size){
-    printf("Error not enoug memory");
+void split(Block * curr, int size){
+  if(curr->size < size){
+    printf("Error not enough memory\n");
     return;
   }
- Block * new;
- new->size=(metadata->size)-size-sizeof(Block);
- new->free=1;
- new->next=metadata->next;
- metadata->size=size;
- metadata->free=0;
- metadata->next=new;
+ Block * new = curr+size;
+ new->size=(curr->size)-size-sizeof(Block);
+ new->free= true;
+ new->next=curr->next;
+ curr->size=size;
+ curr->free= false;
+ curr->next=new;
 }
   
   void merge(){
@@ -62,23 +62,24 @@ void split(int size){
   if(!(metadata->size)){
     intialize(metadata);
   }
-    
   if(size <= 0){
     printf("Error \n");
     return;
   } 
    Block *curr = metadata,*prev;
+    printf("Curr = %p\n", curr);
    void* result;
    while(curr->size < size || curr->free == false || curr->next != NULL){ //Incremenet through blocks till an avaible space is found
      prev = curr;
      curr = curr->next;
    }
   //Now on an avalible block 
+     printf("Curr = %p\n", curr);
     if(curr->size == size && curr->free == true){ //If block size is exactly requested size then there is no more room for extra blocks
       curr->free = false;
       result = curr+1;
     }else if(curr->size > size +sizeof(Block) && curr->free == true ){ //We dont need to account for == size+blocksize since there's no more room anyways
-      split(size);
+      split(curr, size);
       result = curr+1;
     }else{ // If size requested is less than size 
       result=NULL;
@@ -87,8 +88,13 @@ void split(int size){
     return result;
 }
 
-void myFree(){
-    if(metadata->next == NULL){
+void myFree(void * mem){
+  Block * curr = metadata;
+  while(curr != mem){
+    curr++;
+  }
+  
+  /*if(metadata->next == NULL){
         metadata->free = true;
         return;
     }
@@ -97,22 +103,27 @@ void myFree(){
         merge(curr);
         curr->free = true;
     }
+    */
 
 }  
   
 
 int main(int argc, char** argv) {
-  printf("This is the memory address %p\n",memory); 
-  printf("This is the memory address of Block %p\n", metadata);
+  //printf("This is the memory address %p\n",memory); 
+  //printf("This is the memory address of Block %p\n", metadata);
+  //printf("Metadata->size = %d\n", metadata->size);
   char * test = myMalloc(50); 
+    //printf("Metadata->size = %d\n", metadata->size);
   test[0] = 'c';
   test[1] = 'b';
   test[2] = 'a';
+  //printf("Metadata->size = %d\n", metadata->size);
   printf("Test[2] = %p\n", test[2]);
   printf("Test[1] = %p\n", test[1]);
   printf("Test[0] = %p\n", test[0]);
   printf("Memory address of test = %p\n", test);
-  char * tester = malloc(sizeof(char) * 50);
+  //printf("Memory address of metadata + 1 = %p\n", metadata + 1);
+  char * tester = myMalloc(111);
   tester[0] = 'f';
   tester[1] = 'e';
   tester[2] = 'd';
@@ -120,6 +131,13 @@ int main(int argc, char** argv) {
   printf("Test[1] = %p\n", tester[1]);
   printf("Test[0] = %p\n", tester[0]);
   printf("Memory address of test = %p\n", tester);
+  //printf("Metadata->size = %d\n", metadata->next->size);
+  
+  
+  //free(tester);
+  //myFree();
+  //printf("Tester[2] after free is = %p\n", tester[2]);
+  //printf("Test[2] after free is = %p\n", test[2]);
   return;
   
   
