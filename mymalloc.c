@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include<stddef.h>
 
 typedef int bool;
 #define true 1
@@ -22,17 +21,17 @@ Implementation:
 //Create Process and Block Size
 
 //Metadata block
-typedef struct block Block{
+typedef struct block Block;
   struct block{
-  type_t size;
+  int size;
   bool free;
-  block next;  
+  Block * next;  
 };
 
 const char memory[4096];
 
 
-void intialize(block metadata){
+void intialize(Block *metadata){
      metadata->size = 4096-sizeof(Block);
      metadata->free = true; //True is free, false is not 
      metadata->next = NULL;
@@ -43,6 +42,7 @@ void split(Block *metadata, size_t size){
     printf("Error not enoug memory");
     return;
   }
+ Block * new;
  new->size=(metadata->size)-size-sizeof(Block);
  new->free=1;
  new->next=metadata->next;
@@ -69,13 +69,13 @@ void split(Block *metadata, size_t size){
   }
   
   //Return pointer to memory address + 1 of metadata block
-  char *MyMalloc(Block *metadata,size_t size){
-  if(metadata->size == NULL){
+  void* myMalloc(Block *metadata,size_t size){
+  if(metadata->size <= 0){
     printf("Error \n");
-    return
+    return;
   } 
    Block *curr = metadata,*prev;
-   char *result;
+   void* result;
    while(curr->size < size || curr->free == false || curr->next != NULL){ //Incremenet through blocks till an avaible space is found
      prev = curr;
      curr = curr->next;
@@ -93,7 +93,7 @@ void split(Block *metadata, size_t size){
     return result;
 }
 
-void free(Block * metadata){
+void myFree(Block * metadata){
     if(metadata->next == NULL){
         metadata->free = true;
         return;
@@ -108,4 +108,6 @@ void free(Block * metadata){
   
 
 int main(int argc, char** argv) {
+  
+  
 }
