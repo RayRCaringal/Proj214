@@ -92,6 +92,19 @@ void split(Block *metadata, size_t size){
   }
     return result;
 }
+
+void free(Block * metadata){
+    if(metadata->next == NULL){
+        metadata->free = true;
+        return;
+    }
+    Block * curr = metadata;
+    while(curr->next != NULL){
+        merge(curr);
+        curr->free = true;
+    }
+
+}  
   
 
 int main(int argc, char** argv) {
