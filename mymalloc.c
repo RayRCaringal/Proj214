@@ -39,22 +39,17 @@ void split(Block * curr, int size){
  curr->free= false;
  curr->next=new;
 }
-  
+ //Is only called in free so there should be a valid memory address
+//There is at least one metadata block 
   void merge(){
-     if(metadata->next == NULL){
-         metadata->free = true;
-         return;
-     } 
-    Block * curr = metadata, * prev; 
-    while(curr ->next != NULL){
-        if(curr->free == false && curr->next->free == false){
+    Block * curr = metadata;
+    while(curr->next != NULL){
+        if(curr->free == true && curr->next->free == true){
             curr->size = curr->size + curr->next->size + sizeof(Block); 
             curr->next = curr->next->next;
         }
-      prev = curr;
-      curr->next = curr->next->next;
+      curr = curr->next;
     }
-    
   }
   
   //Return pointer to memory address + 1 of metadata block
@@ -89,22 +84,13 @@ void split(Block * curr, int size){
 }
 
 void myFree(void * mem){
-  Block * curr = metadata;
-  while(curr != mem){
-    curr++;
+  if(!(mem > (void* )metadata && mem < ((void *) metadata + 4096))){
+    printf("Error, memomry address is out of bounds.");
+    return;
   }
-  
-  /*if(metadata->next == NULL){
-        metadata->free = true;
-        return;
-    }
-    Block * curr = metadata;
-    while(curr->next != NULL){
-        merge(curr);
-        curr->free = true;
-    }
-    */
-
+  Block * curr = mem-1; //Metadata block is stored 1 memory address before
+  curr->free = true;
+  merge();
 }  
   
 
@@ -131,6 +117,13 @@ int main(int argc, char** argv) {
   printf("Test[1] = %p\n", tester[1]);
   printf("Test[0] = %p\n", tester[0]);
   printf("Memory address of test = %p\n", tester);
+  Block * curr = metadata;
+  while(curr != (void*)tester){
+    curr++;
+  }
+  printf("Curr = %p\n", curr);
+  
+  
   //printf("Metadata->size = %d\n", metadata->next->size);
   
   
