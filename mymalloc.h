@@ -6,6 +6,7 @@ typedef int bool;
 #define true 1
 #define false 0
 
+bool init= false;
 
 typedef struct block Block;
   struct block{
@@ -14,18 +15,18 @@ typedef struct block Block;
   Block * next;  
 };
 
+#define malloc( x ) mymalloc( x, __FILE__, __LINE__ )
+#define free( x ) myfree( x, __FILE__, __LINE__ )
+
 static char memory[4096];
 Block * metadata = (void*) memory;
 
 
 void intialize();
-void split(Block * curr, int size);
+void split(Block *, int, char *, int);
 void merge();
-void* myMalloc(int size);
-void myFree();
-
-
-//#define malloc( x ) mymalloc( x, __FILE__, __LINE__ )
-//#define free( x ) myfree( x, __FILE__, __LINE__ )
+Block * get_avalible(int);
+void* mymalloc(int, char *, int );
+void myfree(void *, char *, int );
 
 #endif
