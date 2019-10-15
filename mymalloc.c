@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "mymalloc.h"
 
-
 void intialize(){
      metadata->size = 4096-sizeof(Block); // Inital size is 4080 
      metadata->free = true; //True is free, false is not 
@@ -57,9 +56,9 @@ Block * get_avalible(int size){
 
   //Return pointer to memory address + 1 of metadata block
   void* mymalloc(int size, char * file, int line){
-  if(init == false){ //Check if the metadata is initalized 
+  if(initalized == false){ //Check if the metadata is initalized 
     intialize(metadata);
-    init = true;
+    initalized = true;
   }
   if(size <= 0 || size > (4096 - sizeof(Block)) ){ 
     printf("Error in %s line %d: Invalid Size\n", file, line);
@@ -82,11 +81,11 @@ Block * get_avalible(int size){
 //Check if memory address is connected to a metadata block
 bool check(void * mem){
   Block * temp = metadata;
-  while(curr->next == NULL){
-     if(curr == mem-1){
+  while(temp->next != NULL){
+     if(temp == mem-1){
        return true;
      }
-    curr = curr->next;
+    temp = temp->next;
   }
   return false;
 }

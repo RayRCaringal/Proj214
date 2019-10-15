@@ -8,7 +8,7 @@
 #include <sys/time.h>
 #include "mymalloc.h"
 
-srand(time(NULL));
+//srand(time(NULL));
 
 //A: malloc() 1 byte and immediately free it - do this 150 times
 double testcaseA(){
@@ -81,13 +81,13 @@ double testcaseC(){
 		}
 	}
 	i = 0;
-    while(inUse != 0){
-        if(temp[i] != &garbadge){
-            free(temp[n]);
-                temp[n] = &garbadge;
-                inUse--;
-        }
-        i++;
+   while(inUse != 0){
+      if(temp[i] != &garbadge){
+           free(temp[i]);
+           temp[i] = &garbadge;
+           inUse--;
+      }
+      i++;
     }
 	gettimeofday(&end, NULL);
 	double elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0) ;
@@ -103,7 +103,7 @@ Randomly choose between a randomly-sized malloc() or free()ing a pointer – do 
 */
 double testcaseD(){
     struct timeval begin, end;
-	void * temp[4096];
+	  void* temp[4096];
     int garbadge = 8; // a garbadge address that does nothing; 
     int i;
     for(i = 0; i < 4096; i++){
@@ -116,16 +116,17 @@ double testcaseD(){
         int n = rand() % 4096; //Random index 
         int randomSize = (rand() % 64) + 1;
 		if(r == 0){//Malloc
-            if(temp[n] == &garbadge && (totalSize + random_size) < 4096){
-            temp[n] = malloc(size);
-			mallocCount++;
+            if(temp[n] == &garbadge && (totalSize + randomSize) < 4096){
+            temp[n] = malloc(randomSize);
+			      mallocCount++;
             inUse++;
-			totalSize = totalSize + randomSize + sizeof(Block);
+			      totalSize = totalSize + randomSize + sizeof(Block);
             }
 		}
 		else{ // Free
 			if(temp[n] != &garbadge){
-                totalSize = totalSize-((temp[n]-1)->size + sizeof(Block));
+                Block * curr = (void *) temp-1;
+                totalSize = totalSize - (curr->size + sizeof(Block));
                 free(temp[n]);
                 temp[n] = &garbadge;
                 inUse--;              
@@ -136,8 +137,8 @@ double testcaseD(){
     i = 0;
     while(inUse != 0){
         if(temp[i] != &garbadge){
-            free(temp[n]);
-                temp[n] = &garbadge;
+            free(temp[i]);
+                temp[i] = &garbadge;
                 inUse--;
         }
         i++;
@@ -149,15 +150,15 @@ double testcaseD(){
 
 //malloc() the entire area and free it immediately- do this 150 times
 double testcaseE(){
-    struct timeval begin, end;
-	void * temp[4096]; //A temp array so that way we don't effect the actual memory 
+  struct timeval begin, end;
+	void* temp[4096]; //A temp array so that way we don't effect the actual memory 
 	gettimeofday(&begin, NULL);
-    int i = 0;
-	while(i < 150)
-		temp[0] = malloc((4096-sizeof(Block)));
+  int i = 0;
+	while(i < 150){
+    		temp[0] = malloc((4096-sizeof(Block)));
 		free(temp[0]);
         i++;
-	}
+  }
 	gettimeofday(&end, NULL);
 	double elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0) ;
 	return elapsed;
@@ -168,20 +169,20 @@ double testcaseE(){
 //Random allocation size between 1 to 4096 - sizeof(Block)
 double testcaseF(){
   struct timeval begin, end;
-	void * temp[4096]; //A temp array so that way we don't effect the actual memory 
-  void * ptr = temp;
+	void* temp[4096]; //A temp array so that way we don't effect the actual memory 
+  Block * ptr = temp;
 	gettimeofday(&begin, NULL);
   int size = 0;
 	while(size < 4096){
        int randomSize = (rand() % (4096 - sizeof(Block))) + 1;
-		temp[size] = malloc(random_size);
-        size = random_size+sizeof(Block);
+		temp[size] = malloc(randomSize);
+        size = randomSize+sizeof(Block);
     }
-
+    
     while(size > 0){
-    size = size - temp->size + sizeof(Block);
+    size = size - ptr->size + sizeof(Block);
     free(temp+1);
-    temp = temp+temp->size;
+    ptr = ptr+ptr->size;
     }
 	gettimeofday(&end, NULL);
 	double elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0) ;
@@ -201,12 +202,12 @@ int main(){
 		f += testcaseF();
 	}
 
-	printf("Avg time for A: %f seconds\n", time_A/100);
-	printf("Avg time for B: %f seconds\n", time_B/100);
-	printf("Avg time for C: %f seconds\n", time_C/100);
-	printf("Avg time for D: %f seconds\n", time_D/100);
-	printf("Avg time for E: %f seconds\n", time_E/100);
-	printf("Avg time for F: %f seconds\n", time_F/100);
+	printf("Avg time for A: %f seconds\n", a/100);
+	printf("Avg time for B: %f seconds\n", b/100);
+	printf("Avg time for C: %f seconds\n", c/100);
+	printf("Avg time for D: %f seconds\n", d/100);
+	printf("Avg time for E: %f seconds\n", e/100);
+	printf("Avg time for F: %f seconds\n", f/100);
 	
 	return 0;
 }
