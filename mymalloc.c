@@ -12,7 +12,7 @@ void intialize(){
 //Splits the metadata block into two, left side is the requested memory right side is remaining memory, points towards null 
 void split(Block * curr, int size, char * file, int line){
  if(curr->size < size){
-    printf("Error in %s line %d: Not Enough Memory\n");
+    printf("Error in %s line %d: Not Enough Memory\n", file, line);
     return;
   }
  printf("Curr address is = %p\n", curr);
@@ -61,7 +61,7 @@ Block * get_avalible(int size){
     intialize(metadata);
     init = true;
   }
-  if(size <= 0 || size >= 4096){ 
+  if(size <= 0 || size > (4096 - sizeof(Block)) ){ 
     printf("Error in %s line %d: Invalid Size\n", file, line);
     return NULL;
   } 
@@ -79,15 +79,28 @@ Block * get_avalible(int size){
   }
     return result;
 }
+//Check if memory address is connected to a metadata block
+bool check(void * mem){
+  Block * temp = metadata;
+  while(curr->next == NULL){
+     if(curr == mem-1){
+       return true;
+     }
+    curr = curr->next;
+  }
+  return false;
+}
 
 void myfree(void * mem, char * file, int line){
  if(!(mem > (void* )metadata && mem < ((void *) metadata + 4096))){
     printf("Error in %s line %d: Memomry Address Is Out Of Bounds.\n", file, line);
     return;
   }
-  Block * curr = mem-1; //Metadata block is stored 1 memory address before
-  curr->free = true;
-  merge();
+  if(check(mem) == true){
+    Block * curr = mem-1; //Metadata block is stored 1 memory address before
+    curr->free = true;
+    merge();
+  }
 }  
   
 int count(){
@@ -103,7 +116,7 @@ int count(){
 int main(int argc, char** argv) {
 
   printf("This is the memory address %p\n",memory); 
-  printf("Size of block = %d\n", sizeof(Block));
+  printf("Size of block = %zu\n", sizeof(Block));
   char * test = malloc(10);
   test[0] = 'c';
   test[1] = 'b';
@@ -120,7 +133,6 @@ int main(int argc, char** argv) {
   printf("Tester[2] = %p\n", &tester[2]);
   printf("Tester[1] = %p\n", &tester[1]);
   printf("Tester[0] = %p\n", &tester[0]);
-  Block * a = (void *) test-1, * b = (void *) tester-1;
   char * testing = malloc(30);
   printf("Count = %d\n", count());
   free(tester);
@@ -128,7 +140,7 @@ int main(int argc, char** argv) {
   free(testing);
   printf("Count = %d\n", count());
 
-  return;
+  return 0;
   
   
 }
