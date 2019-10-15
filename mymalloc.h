@@ -27,6 +27,8 @@ void split(Block *, int, char *, int);
 void merge();
 Block * get_avalible(int);
 void* mymalloc(int, char *, int );
+bool check(void * mem);
 void myfree(void *, char *, int );
+
 
 #endif
