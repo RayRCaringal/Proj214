@@ -6,7 +6,7 @@ typedef int bool;
 #define true 1
 #define false 0
 
-bool initalized = false;
+extern bool initalized;
 
 typedef struct block Block;
   struct block{
@@ -18,8 +18,7 @@ typedef struct block Block;
 #define malloc( x ) mymalloc( x, __FILE__, __LINE__ )
 #define free( x ) myfree( x, __FILE__, __LINE__ )
 
-static char memory[4096];
-Block * metadata = (void*) memory;
+extern Block * metadata;
 
 
 void intialize();

@@ -10,18 +10,20 @@
 
 //srand(time(NULL));
 
+
 //A: malloc() 1 byte and immediately free it - do this 150 times
 double testcaseA(){
 	struct timeval begin, end;
-	void * temp[4096]; //A temp array so that way we don't effect the actual memory 
+	void* temp[4096]; //A temp array so that way we don't effect the actual memory 
 	gettimeofday(&begin, NULL);
     int i;
 	for(i = 0; i < 150; i++){
 		temp[i] = malloc(1);
 		free(temp[i]);
 	}
+
 	gettimeofday(&end, NULL);
-	double elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0) ;
+	double elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0);
 	return elapsed;
 }
 //B: malloc() 1 byte, store the pointer in an array - do this 150 times.
@@ -170,17 +172,18 @@ double testcaseE(){
 double testcaseF(){
   struct timeval begin, end;
 	void* temp[4096]; //A temp array so that way we don't effect the actual memory 
-  Block * ptr = temp;
+  Block * ptr = (void *)temp;
 	gettimeofday(&begin, NULL);
   int size = 0;
 	while(size < 4096){
        int randomSize = (rand() % (4096 - sizeof(Block))) + 1;
-		temp[size] = malloc(randomSize);
+		  temp[size] = malloc(randomSize);
         size = randomSize+sizeof(Block);
     }
     
     while(size > 0){
-    size = size - ptr->size + sizeof(Block);
+    int decrease = ptr->size+sizeof(Block);
+    size = size - decrease; 
     free(temp+1);
     ptr = ptr+ptr->size;
     }
@@ -190,7 +193,7 @@ double testcaseF(){
 }
 
 int main(){
-	double a = 0, b = 0, c = 0, d = 0, e = 0, f = 0;
+	double a = 0, b = 0,  c = 0, d = 0, e = 0, f = 0;
 	int i;
   //Repeats all test cases 100 times 
 	for(i = 0; i < 100; i++){
