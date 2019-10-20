@@ -11,17 +11,15 @@ void intialize(){
      metadata->free = true; //True is free, false is not 
      metadata->next = NULL;
 }
-  
+
 //Splits the metadata block into two, left side is the requested memory right side is remaining memory, points towards null 
 void split(Block * curr, int size, char * file, int line){
  if(curr->size < size){
-  //  printf("Error in %s line %d: Not Enough Memory\n", file, line);
+   printf("Error in %s line %d: Not Enough Memory. Not Enough Space\n", file, line);
     return;
   }
-// printf("Curr address is = %p\n", curr);
  Block * new = (void *)curr + size + sizeof(Block); 
  new->size=(curr->size)-(size+sizeof(Block));
-// printf("New address is = %p\n", new);
  new->free= true;
  new->next= NULL;
  curr->size = size;
@@ -33,13 +31,13 @@ We cannot remove data blocks from the linked list and merge them back with total
 of Metadata blocks that are ahead. Instead we should check for metadatablocks that are next to each other that are free and fuse those.
 */
 
-  //Fuses metadata blocks that are adjacent to each other 
+  //Merges adjacent metadata blocks in order to save space 
   void merge(){
     Block * curr = metadata;
     if(curr->next == NULL){ // There are at least 2 blocks when memory is allocated 
       return;
     }
-    while(curr->next->next != NULL){
+    while(curr->next->next != NULL){ //Check for ->next->next caue we're looking at two differnet blocks, also this works for if there is only one metadata block
         if(curr->free == true && curr->next->free == true){
             curr->size = curr->size + curr->next->size + sizeof(Block); //We need to include the metadata block as well as the data's size
             curr->next = curr->next->next;
@@ -58,7 +56,6 @@ Block * get_avalible(int size){
   return avalible;
 }
 
-
   //Return pointer to memory address + 1 of metadata block
   void* mymalloc(int size, char * file, int line){
   if(initalized == false){ //Check if the metadata is initalized 
@@ -66,7 +63,7 @@ Block * get_avalible(int size){
     initalized = true;
   }
   if(size <= 0 || size > (4096 - sizeof(Block)) ){ 
-   // printf("Error in %s line %d: Invalid Size\n", file, line);
+    printf("Error in %s line %d: Invalid Size\n", file, line);
     return NULL;
   } 
    Block * curr = get_avalible(size);
@@ -79,7 +76,7 @@ Block * get_avalible(int size){
       result = (void *)curr+1;
     }else{ // If size requested is less than size 
       result=NULL;
-     // printf("Error in %s line %d: Not Enough Memory\n", file, line);
+      printf("Error in %s line %d: Not Enough Memory\n", file, line);
   }
     return result;
 }
@@ -97,7 +94,7 @@ bool check(void * mem){
 
 void myfree(void * mem, char * file, int line){
  if(!(mem > (void* )metadata && mem < ((void *) metadata + 4096))){
-   // printf("Error in %s line %d: Memomry Address Is Out Of Bounds.\n", file, line);
+    printf("Error in %s line %d: Memomry Address Is Out Of Bounds.\n", file, line);
     return;
   }
   if(check(mem) == true){
@@ -116,35 +113,3 @@ int count(){
   }
   return count;
 }
-/*
-
-int main(int argc, char** argv) {
-
-  printf("This is the memory address %p\n",memory); 
-  printf("Size of block = %zu\n", sizeof(Block));
-  char * test = malloc(10);
-  test[0] = 'c';
-  test[1] = 'b';
-  test[2] = 'a';
-  printf("Memory address of test = %p\n", test);
-  printf("Test[2] = %p\n", &test[2]);
-  printf("Test[1] = %p\n", &test[1]);
-  printf("Test[0] = %p\n", &test[0]);
-  char * tester = malloc(20);
-  tester[0] = 'f';
-  tester[1] = 'e';
-  tester[2] = 'd';
-  printf("Memory address of tester = %p\n", tester);
-  printf("Tester[2] = %p\n", &tester[2]);
-  printf("Tester[1] = %p\n", &tester[1]);
-  printf("Tester[0] = %p\n", &tester[0]);
-  char * testing = malloc(30);
-  printf("Count = %d\n", count());
-  free(tester);
-  printf("Count = %d\n", count());
-  free(testing);
-  printf("Count = %d\n", count());
-
-  return 0;
-
-}*/

@@ -8,10 +8,9 @@
 #include <sys/time.h>
 #include "mymalloc.h"
 
-//srand(time(NULL));
-
 
 //A: malloc() 1 byte and immediately free it - do this 150 times
+
 double testcaseA(){
 	struct timeval begin, end;
 	void* temp[4096]; //A temp array so that way we don't effect the actual memory 
@@ -26,8 +25,11 @@ double testcaseA(){
 	double elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0);
 	return elapsed;
 }
-//B: malloc() 1 byte, store the pointer in an array - do this 150 times.
-//Once you've malloc()ed 150 byte chunks, then free() the 150 1 byte pointers one by one.
+
+/*B: malloc() 1 byte, store the pointer in an array - do this 150 times.
+Once you've malloc()ed 150 byte chunks, then free() the 150 1 byte pointers one by one.
+*/
+
 double testcaseB(){
 	struct timeval begin, end;
 	void * temp[4096]; //A temp array so that way we don't effect the actual memory 
@@ -45,15 +47,15 @@ double testcaseB(){
 	return elapsed;
 }
 
+/*
+ Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer
+> do this until you have allocated 50 times
+- Keep track of each operation so that you eventually malloc() 50 bytes, in total
+> if you have already allocated 50 times, disregard the random and just free() on each iteration
+- Keep track of each operation so that you eventually free() all pointers
+ > don't allow a free() if you have no pointers to free()
+ */
 
-
-// Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer
-//> do this until you have allocated 50 times
-//- Keep track of each operation so that you eventually malloc() 50 bytes, in total
-//> if you have already allocated 50 times, disregard the random and just free() on each
-// iteration
-//- Keep track of each operation so that you eventually free() all pointers
-// > don't allow a free() if you have no pointers to free()
 double testcaseC(){
 	struct timeval begin, end;
 	void * temp[4096];
@@ -62,6 +64,7 @@ double testcaseC(){
     for(i = 0; i < 4096; i++){
         temp[i] = &garbadge;
     }
+  srand(time(NULL));
 	int mallocCount = 0, inUse = 0;
 	gettimeofday(&begin, NULL);
 	while(mallocCount < 50){
@@ -95,6 +98,7 @@ double testcaseC(){
 	double elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0) ;
 	return elapsed;
 }
+
 /*
 Randomly choose between a randomly-sized malloc() or free()ing a pointer – do this many
  times (see below)
@@ -103,6 +107,7 @@ Randomly choose between a randomly-sized malloc() or free()ing a pointer – do 
 - Keep track of each operation so that you eventually free() all pointers
 - Choose a random allocation size between 1 and 64 bytes
 */
+
 double testcaseD(){
     struct timeval begin, end;
 	  void* temp[4096];
@@ -111,6 +116,7 @@ double testcaseD(){
     for(i = 0; i < 4096; i++){
         temp[i] = &garbadge;
     }
+  srand(time(NULL));
 	int mallocCount = 0, inUse = 0, totalSize = 0;
 	gettimeofday(&begin, NULL);
 	while(mallocCount < 50){
@@ -151,6 +157,7 @@ double testcaseD(){
 }
 
 //malloc() the entire area and free it immediately- do this 150 times
+
 double testcaseE(){
   struct timeval begin, end;
 	void* temp[4096]; //A temp array so that way we don't effect the actual memory 
@@ -166,27 +173,33 @@ double testcaseE(){
 	return elapsed;
 }
 
-
-//Randomly fill the entire area with randomly-sized bytes and then free until all pointers are freed
+//Randomly fill the entire area with randomly-sized bytes or until malloced 100 times
+//and then free until all pointers are freed
 //Random allocation size between 1 to 4096 - sizeof(Block)
 double testcaseF(){
   struct timeval begin, end;
-	void* temp[4096]; //A temp array so that way we don't effect the actual memory 
-  Block * ptr = (void *)temp;
-	gettimeofday(&begin, NULL);
-  int size = 0;
-	while(size < 4096){
-       int randomSize = (rand() % (4096 - sizeof(Block))) + 1;
-		  temp[size] = malloc(randomSize);
-        size = randomSize+sizeof(Block);
-    }
-    
-    while(size > 0){
-    int decrease = ptr->size+sizeof(Block);
+	 void* temp[4096]; //A temp array so that way we don't effect the actual memory 
+   Block * ptr = (void *)temp;
+	 gettimeofday(&begin, NULL);
+  int size = 0, count = 0;
+  srand(time(NULL));
+  while(size < 4096 && count < 100 ){
+    	int randomSize = (rand() % (4096 - sizeof(Block))) + 1;
+      temp[size] = malloc(randomSize);
+      count++;
+     if(randomSize+sizeof(Block) < 4096-size && randomSize+sizeof(Block) > size ){
+        size += randomSize+sizeof(Block);
+     }
+    } 
+   while(size > 0){
+   int decrease = ptr->size+sizeof(Block);
     size = size - decrease; 
     free(temp+1);
     ptr = ptr+ptr->size;
-    }
+   }
+    
+    
+    
 	gettimeofday(&end, NULL);
 	double elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0) ;
 	return elapsed;
@@ -195,6 +208,7 @@ double testcaseF(){
 int main(){
 	double a = 0, b = 0,  c = 0, d = 0, e = 0, f = 0;
 	int i;
+  
   //Repeats all test cases 100 times 
 	for(i = 0; i < 100; i++){
 		a += testcaseA();
