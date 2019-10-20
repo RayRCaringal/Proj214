@@ -1,0 +1,10 @@
+testcaseE:
+
+-This test case could be considered an extension of testcase A and B, but instead of doing it a specified amount of time we do it as many time as we're able too
+ as in the size of the memory. This also tests the edgecase of mallocing the final byte
+
+ testcasF:
+
+ -This test case randomly fills the memory with bytes betweens sizes 1 to size of the memory until is either full or the malloc has been called 100 times. This tests what
+ happens when you request several memory sizes too large to store. As you could get 4095 bytes and then 4096 bytes, but of course you only have 1 byte remaining. We included 
+ this because it seemed like a good way to test the error checking functions.  
